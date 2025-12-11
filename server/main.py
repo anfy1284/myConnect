@@ -62,6 +62,10 @@ else:
     # Fallback if config failed
     logging.basicConfig(level=logging.INFO)
 
+# Silence websockets handshake errors (caused by TCP health checks from Koyeb/AWS/etc)
+# These checks open a TCP connection and close it immediately, causing "opening handshake failed" errors.
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
+
 logger = logging.getLogger(__name__)
 
 # Store connected clients: {client_name: websocket}

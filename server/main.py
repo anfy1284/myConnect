@@ -153,7 +153,8 @@ async def process_request(connection, request):
     """
     if request.path == "/health":
         # Return a Response object as required by newer websockets versions
-        return websockets.Response(200, "OK", [("Content-Type", "text/plain")], b"OK")
+        headers = websockets.Headers([("Content-Type", "text/plain")])
+        return websockets.Response(200, "OK", headers, b"OK")
     return None
 
 async def main():

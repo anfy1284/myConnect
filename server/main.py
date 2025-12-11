@@ -62,10 +62,6 @@ else:
     # Fallback if config failed
     logging.basicConfig(level=logging.INFO)
 
-# Silence websockets handshake errors (caused by TCP health checks from Koyeb/AWS/etc)
-# These checks open a TCP connection and close it immediately, causing "opening handshake failed" errors.
-logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
-
 logger = logging.getLogger(__name__)
 
 # Store connected clients: {client_name: websocket}
@@ -151,6 +147,14 @@ async def handler(websocket):
             del connected_clients[client_id]
             logger.info(f"Client disconnected: {client_id}")
 
+async def process_request(connection, request):
+    """
+    Handle HTTP requests for health checks.
+    """
+    if request.path == "/health":
+        return (200, [("Content-Type", "text/plain")], b"OK")
+    return None
+
 async def main():
     if not config:
         return
@@ -176,7 +180,7 @@ async def main():
     # Start log cleanup task
     asyncio.create_task(cleanup_logs())
 
-    async with websockets.serve(handler, host, port, ssl=ssl_context):
+    async with websockets.serve(handler, host, port, ssl=ssl_context, process_request=process_request):
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":

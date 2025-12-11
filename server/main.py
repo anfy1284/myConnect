@@ -152,7 +152,8 @@ async def process_request(connection, request):
     Handle HTTP requests for health checks.
     """
     if request.path == "/health":
-        return (200, [("Content-Type", "text/plain")], b"OK")
+        # Return a Response object as required by newer websockets versions
+        return websockets.Response(200, "OK", [("Content-Type", "text/plain")], b"OK")
     return None
 
 async def main():

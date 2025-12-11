@@ -1,0 +1,4 @@
+pydivert
+websockets
+pystray
+Pillow
